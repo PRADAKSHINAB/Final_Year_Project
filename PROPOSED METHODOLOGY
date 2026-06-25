@@ -1,0 +1,34 @@
+
+
+The proposed research focuses on improving small object detection in UAV aerial imagery by enhancing the UAVDet architecture through the integration 
+of a Tiny Object Aware Attention Module (TOAM). The objective is to improve feature representation and detection accuracy while maintaining computational efficiency.
+
+The overall workflow begins with UAV aerial images obtained from publicly available datasets such as VisDrone, UAVDT, and DroneVehicle. 
+These datasets contain various object categories including cars, trucks, buses, bicycles, motorcycles, and pedestrians captured from aerial viewpoints.
+
+In the first stage, input images are preprocessed through resizing, normalization, and augmentation techniques. 
+Data augmentation methods such as flipping, rotation, scaling, and brightness adjustment are applied to improve model generalization.
+
+The preprocessed images are then passed to the CNN backbone of UAVDet. The CNN component extracts low-level 
+spatial features such as edges, textures, shapes, and object boundaries. These local features provide detailed visual information necessary for object recognition.
+
+Next, the extracted features are processed through the Cross Stage Partial Mamba Block (CSPMB). 
+The Vision Mamba component captures long-range dependencies and global contextual information, allowing the network to understand relationships among distant image regions.
+
+To further improve small object representation, the proposed Tiny Object Aware Attention Module (TOAM) is inserted between the CNN and Mamba stages. 
+The TOAM module analyzes feature maps and assigns higher weights to regions likely to contain small objects while suppressing irrelevant background information.
+
+The enhanced feature maps are subsequently forwarded to the Tiny Feature Pyramid Network (TFPN). 
+TFPN performs multiscale feature fusion by combining low-level and high-level features. This process preserves critical information required for detecting objects of varying sizes, especially tiny objects.
+
+The fused feature representations are then sent to the detection head. The detection head predicts object categories, 
+confidence scores, and bounding box coordinates for each detected object.
+
+The model is trained using supervised learning techniques with annotated ground-truth labels available in the selected datasets.
+Performance evaluation is conducted using standard object detection metrics including Precision, Recall, F1-Score, mAP50, mAP50-95, and Average Precision for Small Objects (APS).
+
+Experimental results obtained from the proposed TOAM-UAVDet framework will be compared against the original UAVDet architecture and 
+other state-of-the-art methods. Improvements in detection accuracy, small object recognition, and computational efficiency will be analyzed.
+
+The proposed methodology is expected to enhance the capability of UAV-based object detection systems by enabling more accurate identification of small objects 
+in complex aerial environments. This improvement can contribute to applications such as traffic monitoring, surveillance, disaster response, smart transportation systems, and public safety management.

@@ -1,4 +1,4 @@
-Enhanced UAVDet: Dynamic Attention-Assisted Multi-Scale Mamba Fusion for Real-Time Small Object Detection in UAV Imagery
+
 
 # Enhanced UAVDet: Dynamic Attention-Assisted Multi-Scale Mamba Fusion for Real-Time Small Object Detection in UAV Imagery
 

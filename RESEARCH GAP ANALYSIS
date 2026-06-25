@@ -1,0 +1,25 @@
+RESEARCH GAP ANALYSIS
+
+Despite significant advancements in UAV-based object detection, accurately detecting small objects in aerial imagery remains a challenging problem. Existing object detection models often suffer from information loss during feature extraction and downsampling operations, resulting in poor detection performance for tiny objects such as vehicles, pedestrians, and bicycles.
+
+MFFSODNet improved multiscale feature fusion but relied mainly on traditional convolutional operations. The model lacked efficient mechanisms for capturing long-range contextual information, which is important for distinguishing small objects from complex backgrounds.
+
+YOLO11s-UAV introduced lightweight feature enhancement techniques and improved feature fusion strategies. Although the model achieved better efficiency, it primarily focused on architectural optimization and did not fully address the challenge of global contextual understanding.
+
+SRTSOD-YOLO enhanced feature aggregation and attention-based feature fusion. While detection performance improved, the model still depended heavily on convolutional feature extraction, limiting its ability to model long-range dependencies and global scene relationships.
+
+SAMYOLO addressed low-resolution object representation using super-resolution and Vision Mamba. However, the inclusion of super-resolution modules significantly increased computational complexity, making deployment more challenging for resource-constrained systems.
+
+UAVDet successfully combined CNN and Vision Mamba to exploit both local and global information. The proposed CSPMB module improved feature representation, while TFPN enhanced small object feature fusion. Although UAVDet achieved strong detection performance, several limitations remain.
+
+First, UAVDet does not explicitly employ dedicated attention mechanisms to focus on critical object regions. Small objects are often surrounded by cluttered backgrounds, causing feature confusion during training and inference.
+
+Second, the model treats all spatial regions with similar importance, despite the fact that small object regions contain more valuable information than large background areas.
+
+Third, the current feature fusion strategy can be further optimized to improve discriminative feature learning for tiny objects.
+
+Fourth, adaptive object-aware feature enhancement techniques are not explored within the UAVDet framework.
+
+Therefore, a significant research gap exists in developing an efficient attention-guided feature enhancement mechanism capable of highlighting important small-object regions while preserving computational efficiency.
+
+To address this limitation, the proposed work introduces a Tiny Object Aware Attention Module (TOAM) integrated into the UAVDet architecture. The proposed module aims to enhance feature representation, suppress irrelevant background information, improve object localization, and increase overall detection accuracy for small objects in UAV imagery.

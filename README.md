@@ -1,75 +1,98 @@
+# Small Object Detection in UAV Imagery Based on UAVDet
 
-
-# Enhanced UAVDet: Dynamic Attention-Assisted Multi-Scale Mamba Fusion for Real-Time Small Object Detection in UAV Imagery
 
 ## 📌 Overview
 
-Small object detection in UAV aerial images is a challenging computer vision task due to tiny object sizes, dense object distribution, and complex backgrounds. Traditional CNN-based detectors often lose fine-grained information, while Transformer-based methods require high computational resources.
+Small object detection in UAV (Unmanned Aerial Vehicle) aerial images is a challenging computer vision task due to tiny object sizes, dense object distribution, varying object scales, and complex backgrounds. Conventional CNN-based detectors often lose fine-grained spatial information during feature extraction, while Transformer-based approaches usually require high computational resources.
 
-This project proposes an enhanced version of **UAVDet**, a CNN-Mamba hybrid object detection framework, by integrating **Dynamic Attention** and **Multi-Scale Mamba Feature Fusion** to improve detection accuracy while maintaining real-time performance.
+This project focuses on reproducing the UAVDet framework for small object detection and investigating further improvements to enhance detection accuracy while maintaining real-time performance.
 
 ---
 
 ## 🎯 Objectives
 
-- Improve small object detection accuracy in UAV imagery.
-- Preserve fine-grained features during feature extraction.
+- Improve small object detection in UAV aerial imagery.
+- Preserve fine-grained feature information.
 - Capture both local and global contextual information.
-- Reduce false detections in complex backgrounds.
-- Maintain lightweight architecture for real-time applications.
+- Reduce false detections in complex environments.
+- Maintain computational efficiency for real-time deployment.
 
 ---
 
-## 🚀 Proposed Method
+## 📖 Base Paper
 
-The proposed framework enhances the original UAVDet architecture by introducing:
+**UAVDet: A CNN–Mamba Hybrid Network for Efficient Small Object Detection in UAV Imagery**
+
+Published in:
+
+> Computer Vision and Image Understanding (Elsevier)
+
+---
+
+## 🚀 Current Progress
+
+- ✅ Literature Survey Completed
+- ✅ Base Paper Selected (UAVDet)
+- ✅ VisDrone2019 Dataset Collected
+- ✅ Development Environment Configured
+- ✅ Baseline Implementation Using YOLOv11 Completed
+- 🔄 Faster R-CNN Implementation In Progress
+- 🔄 Performance Comparison Planned
+- 🔄 Proposed Enhancement Under Investigation
+
+---
+
+## 🏗️ Current Architecture
+
+```
+Input UAV Image
+        │
+        ▼
+Image Preprocessing
+        │
+        ▼
+YOLOv11 Backbone
+        │
+        ▼
+Feature Extraction
+        │
+        ▼
+Neck (Feature Fusion)
+        │
+        ▼
+Detection Head
+        │
+        ▼
+Bounding Boxes + Class Predictions
+```
+
+---
+
+## 💡 Planned Enhancement
+
+The project aims to extend the baseline model after performance evaluation.
+
+Potential enhancements include:
 
 - Dynamic Attention Module
-- Multi-Scale Mamba Feature Fusion
-- Improved Tiny Object Feature Representation
-- Efficient Feature Pyramid Network
-- Optimized Loss Function for better localization
-
----
-
-## 🏗️ Architecture
-
-Input Image
-↓
-CNN Backbone
-↓
-CSPMB (Cross Stage Partial Mamba Block)
-↓
-Dynamic Attention Module
-↓
-Multi-Scale Mamba Fusion
-↓
-Tiny-Focused Feature Pyramid Network (TFPN)
-↓
-Detection Head
-↓
-Bounding Box & Class Prediction
-
----
-
-## ✨ Key Features
-
-- CNN + Mamba Hybrid Architecture
-- Dynamic Attention Mechanism
 - Multi-Scale Feature Fusion
-- Tiny Object Detection Head
-- Lightweight Model
-- Real-Time Detection
-- Reduced False Positives
-- Improved Detection Accuracy
+- Improved Tiny Object Feature Representation
+- Faster R-CNN Performance Comparison
+- Enhanced Localization Strategy
+- Lightweight Feature Enhancement Module
+
+> **Note:** These enhancements are currently under investigation and have not yet been integrated into the implementation.
 
 ---
 
 ## 📂 Dataset
 
-The model is trained and evaluated using:
+### Current Dataset
 
-- VisDrone2019
+- VisDrone2019-DET
+
+### Future Evaluation (Planned)
+
 - UAVDT
 - DroneVehicle
 
@@ -80,24 +103,16 @@ The model is trained and evaluated using:
 - Python
 - PyTorch
 - OpenCV
-- CUDA
-- Mamba
-- Deep Learning
+- YOLOv11
+- Faster R-CNN (Ongoing)
 - Computer Vision
+- Deep Learning
 
 ---
 
-## 📊 Expected Outcomes
+## 📊 Evaluation Metrics
 
-- Improved Average Precision (AP)
-- Better Small Object AP (APs)
-- Reduced False Detections
-- Faster Inference Speed
-- Real-Time UAV Deployment
-
----
-
-## 📈 Evaluation Metrics
+The model will be evaluated using:
 
 - Precision
 - Recall
@@ -109,7 +124,19 @@ The model is trained and evaluated using:
 
 ---
 
+## 📈 Expected Outcomes
+
+- Improved detection of tiny objects
+- Better localization accuracy
+- Reduced false detections
+- Improved feature representation
+- Efficient real-time inference
+
+---
+
 ## 📌 Applications
+
+The proposed framework can be applied to:
 
 - Traffic Monitoring
 - Smart City Surveillance
@@ -121,32 +148,20 @@ The model is trained and evaluated using:
 
 ---
 
-## 🔬 Research Contribution
+## 🔬 Research Direction
 
-This work extends the UAVDet framework by integrating Dynamic Attention with Multi-Scale Mamba Fusion to improve feature representation for tiny objects while preserving real-time inference capability.
+This project reproduces the UAVDet framework and investigates additional techniques to further improve small object detection in UAV imagery. Future work will focus on integrating lightweight feature enhancement techniques and evaluating alternative detection architectures to improve both detection accuracy and computational efficiency.
 
 ---
 
 ## 👩‍💻 Project Team
 
-Final Year B.E. Computer Science and Engineering
+**Department of Computer Science and Engineering**
 
 Kongu Engineering College
 
 ---
 
-## 📄 Base Paper
-
-**UAVDet: A CNN–Mamba Hybrid Network for Efficient Small Object Detection in UAV Imagery**
-
-Published in:
-Computer Vision and Image Understanding (Elsevier), 2026.
-
----
-
 ## 📜 License
 
-This project is developed for academic and research purposes.
-I also recommend slightly refining the title for publication quality:
-
-Enhanced UAVDet: Dynamic Attention-Assisted Multi-Scale Mamba Fusion for Efficient Small Object Detection in UAV Imagery
+This project is developed for academic and research purposes only.

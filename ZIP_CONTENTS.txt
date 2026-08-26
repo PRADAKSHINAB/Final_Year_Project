@@ -1,0 +1,33 @@
+UAVDET SYSTEM - FINAL HPC READY ZIP CONTENTS SUMMARY
+===================================================
+Archive File: uavdet_final_hpc_ready.zip
+Archive Size: 1585.54 MB (1,662,556,414 bytes)
+Total Encapsulated Files: 14,018
+
+DATASET INVENTORY:
+- Total Images: 6,986 (6,471 Train + 500 Val + outputs)
+- COCO Annotation Files: 6 (instances_train.json + instances_val.json)
+- Total VisDrone Classes: 10 (pedestrian, people, bicycle, car, van, truck, tricycle, awning-tricycle, bus, motor)
+
+CODEBASE & SCRIPTS:
+- Python Source Files: 27
+- Key Scripts:
+    * research/prepare_dataset.py
+    * research/check_hpc.py
+    * research/check_dependencies.py
+    * research/run_experiment.py
+    * research/run_all_experiments.py
+    * research/inference.py
+    * research/evaluate_all.py
+    * research/pipeline.py
+    * research/sanity_test.py
+
+DOCUMENTATION:
+- docs/PROJECT_AUDIT_FINAL.md
+- docs/RESEARCH_GAP.md
+- docs/NOVELTY_CLAIM.md
+- docs/EXPERIMENT_PLAN.md
+- docs/ERROR_ANALYSIS.md
+- EXPERIMENT_GUIDE.md
+- RESULTS_GUIDE.md
+- README.md

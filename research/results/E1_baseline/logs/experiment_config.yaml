@@ -1,0 +1,77 @@
+amp: true
+attention:
+  location: fpn_output
+  reduction_ratio: 32
+  type: coordinate_attention
+batch_size: 4
+dataset:
+  num_classes: 11
+  num_fg_classes: 10
+  root: Dataset/VisDrone2019-DET-val
+  train_root: Dataset/VisDrone2019-DET-train/VisDrone2019-DET-train
+  val_root: Dataset/VisDrone2019-DET-val
+debug:
+  batch_size: 2
+  epochs: 5
+  img_size: 640
+  subset_fraction: 0.05
+  workers: 2
+device: cuda
+early_stopping_patience: 20
+epochs: 100
+freeze_backbone_epochs: 5
+grad_clip: 10.0
+img_size: 1280
+log_interval: 50
+mode: research
+model:
+  anchor_ratios:
+  - 0.5
+  - 1.0
+  - 2.0
+  - 3.0
+  anchor_sizes:
+  - - 16
+  - - 32
+  - - 64
+  - - 128
+  - - 256
+  backbone: resnet50
+  box_detections_per_img: 300
+  box_nms_thresh: 0.5
+  box_score_thresh: 0.05
+  freeze_backbone_epochs: 5
+  max_size: 1280
+  min_size: 640
+  pretrained_backbone: true
+model_name: baseline_fasterrcnn
+optimizer:
+  lr: 0.005
+  momentum: 0.9
+  nesterov: true
+  type: SGD
+  weight_decay: 0.0001
+output:
+  checkpoint_dir: checkpoints
+  experiment_dir: experiments
+  results_dir: results
+research:
+  batch_size: 4
+  epochs: 100
+  img_size: 1280
+  subset_fraction: 1.0
+  workers: 8
+scale_aware_rpn:
+  context_channels: 64
+  scale_bins: 4
+scheduler:
+  eta_min: 1.0e-05
+  type: cosine
+  warmup_epochs: 3
+seed: 42
+training:
+  amp: true
+  early_stopping_patience: 20
+  grad_clip: 10.0
+  log_interval: 50
+workers: 8

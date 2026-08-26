@@ -1,0 +1,37 @@
+EXPERIMENT SUMMARY — baseline_fasterrcnn
+============================================================
+Model:              baseline_fasterrcnn
+Dataset:            VisDrone-DET 2019
+Train images:       NOT_KNOWN
+Val images:         500
+Image size:         1280 px
+Batch size:         4
+Epochs:             100
+Optimizer:          SGD lr=0.005
+LR scheduler:       CosineAnnealing + warmup
+Random seed:        42
+
+GPU:                NVIDIA H200 NVL
+PyTorch version:    2.13.0+cu130
+CUDA version:       13.0
+OS:                 Linux 6.8.0-137-generic
+
+Parameters (total): 41.347 M
+Parameters (train): 41.347 M
+GFLOPs:             null (install fvcore)
+Inference time:     41.47 ms
+FPS:                24.11
+GPU mem (peak):     938.6 MB
+
+Evaluation Metrics:
+  mAP@0.50:         0.0652
+  mAP@0.5:0.95:     0.0396
+  AP_small:         0.0245
+  AP_medium:        0.0364
+  AP_large:         0.0491
+  Precision:        0.0652
+  Recall:           0.0655
+  F1:               0.0654
+
+Best checkpoint selected by: mAP@0.50 (validation set).
+All metrics from pycocotools COCOeval — no values are fabricated.

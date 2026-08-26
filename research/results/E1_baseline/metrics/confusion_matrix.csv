@@ -1,0 +1,12 @@
+GT_backslash_Pred,__background__,pedestrian,people,bicycle,car,van,truck,tricycle,awning-tricycle,bus,motor
+__background__,0,480,115,21,56,46,66,14,7,0,71
+pedestrian,11235,1987,22,0,0,0,0,0,0,0,1
+people,5900,44,238,0,0,0,0,0,0,0,3
+bicycle,2221,1,1,16,0,0,0,0,0,0,6
+car,11049,0,0,0,232,6,4,0,0,0,0
+van,1113,0,0,0,31,64,1,0,0,0,0
+truck,596,0,0,0,2,2,207,0,0,0,0
+tricycle,633,0,0,1,1,0,0,9,0,0,1
+awning-tricycle,444,0,0,0,3,0,0,6,15,0,1
+bus,377,0,0,0,0,0,0,0,0,0,0
+motor,3791,4,4,0,0,0,0,0,0,0,123

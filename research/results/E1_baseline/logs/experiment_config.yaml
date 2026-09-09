@@ -19,6 +19,7 @@ debug:
 device: cuda
 early_stopping_patience: 20
 epochs: 100
+experiment: baseline
 freeze_backbone_epochs: 5
 grad_clip: 10.0
 img_size: 1280
@@ -44,7 +45,6 @@ model:
   max_size: 1280
   min_size: 640
   pretrained_backbone: true
-model_name: baseline_fasterrcnn
 optimizer:
   lr: 0.005
   momentum: 0.9

@@ -235,10 +235,10 @@ CLASS_COLORS_BGR = [
 ]
 
 BENCHMARK_DATA = {
-    "models": ["HiSMD-Net\n(Ours)", "YOLOv8-m", "YOLOv9-c", "RT-DETR-R50", "Faster R-CNN"],
-    "ap50":   [68.43, 60.80, 62.40, 59.10, 47.20],
-    "map":    [47.80, 39.20, 41.60, 38.90, 28.70],
-    "aps":    [30.23, 17.40, 18.10, 14.20, 9.10],
+    "models": ["HiSMD-Net\n(Ours)", "UAVDet\n(Base Paper)", "YOLOv9-c", "YOLOv8-m", "RT-DETR-R50", "Faster R-CNN"],
+    "ap50":   [68.43, 64.20, 62.40, 60.80, 59.10, 47.20],
+    "map":    [47.80, 43.10, 41.60, 39.20, 38.90, 28.70],
+    "aps":    [30.23, 24.50, 18.10, 17.40, 14.20, 9.10],
 }
 
 CHECKPOINT_PATHS = [

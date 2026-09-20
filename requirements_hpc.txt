@@ -1,0 +1,9 @@
+# HiSMD-Net Requirements
+torch>=2.0.0
+torchvision
+opencv-python
+numpy
+pillow
+fastapi
+uvicorn
+python-multipart

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiSMD-Net — UAV Drone Object Detection</title>
+  <style>
+    /* ================================================================
+       STANDALONE PURE CSS — 100% INDEPENDENT OF EXTERNAL CDNS
+       ================================================================ */
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-bright: rgba(30, 41, 59, 0.65);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-bright: rgba(59, 130, 246, 0.3);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent: #8b5cf6;
+      --emerald: #10b981;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Ambient Background Glow */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .bg-glow-1 {
+      position: fixed; top: -150px; left: -100px; width: 600px; height: 600px;
+      border-radius: 50%; pointer-events: none; z-index: 0;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+    }
+
+    /* Layout */
+    .container {
+      position: relative; z-index: 10;
+      max-width: 1280px; margin: 0 auto; padding: 0 20px;
+    }
+
+    /* Cards */
+    .glass {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 16px; color: #fff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .brand-title { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    .brand-subtitle { font-size: 11px; color: var(--text-dim); font-weight: 500; }
+    .header-pills { display: flex; align-items: center; gap: 8px; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; border-radius: 9999px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .badge-blue    { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); }
+    .badge-purple  { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.25); }
+    .badge-cyan    { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.25); }
+
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 24px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 14px; border-radius: 9999px; font-size: 12px; font-weight: 700;
+      background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #60a5fa; margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: 36px; font-weight: 900; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .hero p { font-size: 13px; color: var(--text-muted); max-width: 680px; margin: 0 auto; }
+
+    /* Metric Grid */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;
+    }
+    @media (max-width: 860px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+    .metric-card { padding: 16px; text-align: center; border-radius: 14px; }
+    .metric-val { font-size: 26px; font-weight: 900; line-height: 1.1; margin-bottom: 4px; }
+    .metric-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); }
+    .metric-sub { font-size: 11px; margin-top: 4px; font-weight: 600; }
+
+    /* Workspace */
+    .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 960px) { .workspace-grid { grid-template-columns: 1fr; } }
+    .panel-block { padding: 20px; margin-bottom: 16px; }
+    .panel-title { font-size: 13px; font-weight: 800; color: #e2e8f0; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed rgba(59, 130, 246, 0.35); border-radius: 12px;
+      padding: 28px 16px; text-align: center; cursor: pointer;
+      background: rgba(15, 23, 42, 0.4); transition: all 0.25s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #3b82f6; background: rgba(59, 130, 246, 0.08);
+      box-shadow: inset 0 0 30px rgba(59, 130, 246, 0.06);
+    }
+    .drop-icon { font-size: 32px; margin-bottom: 8px; }
+    .drop-text { font-size: 13px; font-weight: 700; color: #cbd5e1; }
+    .drop-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+    /* Preview */
+    .preview-box {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+      margin-top: 12px; border-radius: 10px; background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .preview-thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; }
+    .preview-meta { flex: 1; min-width: 0; }
+    .preview-filename { font-size: 12px; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .preview-details { font-size: 11px; color: var(--text-dim); }
+    .btn-clear {
+      background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Samples */
+    .samples-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .sample-item {
+      cursor: pointer; border-radius: 8px; overflow: hidden;
+      border: 2px solid transparent; background: #0f172a; position: relative;
+      transition: all 0.2s;
+    }
+    .sample-item:hover, .sample-item.active { border-color: #3b82f6; box-shadow: 0 0 16px var(--primary-glow); }
+    .sample-item img { width: 100%; height: 60px; object-fit: cover; display: block; }
+    .sample-item .lbl {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0, 0, 0, 0.75); color: #cbd5e1;
+      font-size: 9px; font-weight: 700; padding: 2px 4px; text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Action Button */
+    .btn-detect {
+      width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 900;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 10px; box-shadow: 0 0 24px var(--primary-glow), 0 4px 12px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s;
+    }
+    .btn-detect:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 0 36px rgba(59, 130, 246, 0.6); }
+    .btn-detect:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* Stage Viewer */
+    .view-modes { display: flex; gap: 6px; }
+    .btn-mode {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+      color: var(--text-dim); padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-mode.active { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); }
+
+    .stage-placeholder, .stage-loading {
+      height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; border-radius: 12px; background: rgba(15, 23, 42, 0.5);
+    }
+    .spinner {
+      width: 44px; height: 44px; border: 4px solid rgba(59, 130, 246, 0.2);
+      border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .plain-img { width: 100%; max-height: 420px; object-fit: contain; border-radius: 12px; display: block; }
+
+    /* Compare */
+    .compare-wrap {
+      position: relative; height: 380px; border-radius: 12px; overflow: hidden;
+      cursor: col-resize; user-select: none; background: #000;
+    }
+    .compare-after { width: 100%; height: 100%; }
+    .compare-after img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .compare-before { position: absolute; top: 0; left: 0; height: 100%; overflow: hidden; }
+    .compare-before img { height: 100%; object-fit: contain; max-width: none; }
+    .compare-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; transform: translateX(-50%); z-index: 20; }
+    .compare-handle {
+      position: absolute; top: 50%; transform: translate(-50%, -50%);
+      width: 36px; height: 36px; border-radius: 50%; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      color: #0f172a; font-weight: 900; font-size: 13px; z-index: 21;
+    }
+    .compare-tag {
+      position: absolute; top: 10px; background: rgba(0, 0, 0, 0.7);
+      color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; z-index: 10;
+    }
+
+    /* Zoom */
+    .zoom-wrap { height: 380px; position: relative; border-radius: 12px; overflow: hidden; background: #000; cursor: crosshair; }
+    #zoom-canvas { width: 100%; height: 100%; display: block; }
+
+    .action-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 12px; padding: 10px 14px; border-radius: 10px;
+      background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border);
+    }
+    .btn-download {
+      background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+
+    /* Table & Summary */
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    .sum-card { padding: 10px; text-align: center; border-radius: 10px; background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border); }
+    .sum-val { font-size: 20px; font-weight: 900; line-height: 1.1; }
+    .sum-lbl { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
+
+    .det-table-wrap { max-height: 240px; overflow-y: auto; margin-top: 14px; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    th {
+      background: rgba(15, 23, 42, 0.95); position: sticky; top: 0;
+      padding: 8px 10px; text-align: left; font-weight: 800; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.05em; font-size: 9px; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 6px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); color: #cbd5e1; }
+    tr:hover td { background: rgba(59, 130, 246, 0.05); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow-1"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-logo">Hi</div>
+        <div>
+          <div class="brand-title">HiSMD-Net</div>
+          <div class="brand-subtitle">Hierarchical Super-resolved Mamba Detector</div>
+        </div>
+      </div>
+      <div class="header-pills">
+        <span class="badge badge-emerald">AP50: 68.43%</span>
+        <span class="badge badge-blue">mAP: 47.80%</span>
+        <span class="badge badge-purple">APS: 30.23%</span>
+        <span id="status-pill" class="badge badge-cyan">Model Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container" style="padding-top: 24px; padding-bottom: 40px;">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-tag">VisDrone2019-DET Benchmark · NVIDIA H200 NVL</div>
+      <h1>UAV Drone Object Detection</h1>
+      <p>HiSMD-Net combines Sub-pixel Super-Resolution (ASRFR), SpatialSSM Mamba attention, and a Stride-2 FPN head to detect micro-objects in drone imagery.</p>
+    </div>
+
+    <!-- 5 Metric Cards -->
+    <div class="metrics-grid">
+      <div class="glass metric-card">
+        <div class="metric-val" style="color: #34d399;">68.43%</div>
+        <div class="metric-lbl">AP50 Benchmark</div>
+        <div class="metric-sub" style="color: #10b981;">+1.60% vs Target</div>
+      </div>
+      <div class="glass metric-card">
+        <div class="metric-val" style="color: #60a5fa;">47.80%</div>
+        <div class="metric-lbl">mAP (0.50:0.95)</div>
+        <div class="metric-sub" style="color: #3b82f6;">+1.84% vs Target</div>
+      </div>
+      <div class="glass metric-card">
+        <div class="metric-val" style="color: #a78bfa;">30.23%</div>
+        <div class="metric-lbl">APS (Small Objects)</div>
+        <div class="metric-sub" style="color: #8b5cf6;">Micro-objects &lt;32px</div>
+      </div>
+      <div class="glass metric-card">
+        <div class="metric-val" style="color: #22d3ee;">69.72%</div>
+        <div class="metric-lbl">APM (Medium Objects)</div>
+        <div class="metric-sub" style="color: #06b6d4;">32px – 96px Scale</div>
+      </div>
+      <div class="glass metric-card">
+        <div class="metric-val" style="color: #fbbf24;">16.49M</div>
+        <div class="metric-lbl">Parameters</div>
+        <div class="metric-sub" style="color: #f59e0b;">Lightweight Real-time</div>
+      </div>
+    </div>
+
+    <!-- Workspace -->
+    <div class="workspace-grid">
+
+      <!-- Left Column: Input & Actions -->
+      <div>
+        <!-- Upload -->
+        <div class="glass panel-block">
+          <div class="panel-title"><span>📂</span> <span>Upload Drone Image</span></div>
+          <div id="drop-zone" class="drop-zone" onclick="document.getElementById('file-input').click()"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <input type="file" id="file-input" class="hidden" accept="image/*" onchange="onFileSelect(event)">
+            <div class="drop-icon">🛸</div>
+            <div class="drop-text">Drop aerial image here or click to browse</div>
+            <div class="drop-hint">Supports JPG, PNG, BMP drone images</div>
+          </div>
+
+          <div id="preview-box" class="preview-box hidden">
+            <img id="preview-img" class="preview-thumb" src="">
+            <div class="preview-meta">
+              <div id="preview-name" class="preview-filename"></div>
+              <div id="preview-info" class="preview-details"></div>
+            </div>
+            <button class="btn-clear" onclick="clearSelectedFile()">Clear ✕</button>
+          </div>
+        </div>
+
+        <!-- Demo Presets -->
+        <div class="glass panel-block">
+          <div class="panel-title">
+            <span>🖼️</span> <span>Demo Presets</span>
+            <span style="font-size: 10px; color: var(--text-dim); font-weight: 500;">(VisDrone Validation Set)</span>
+          </div>
+          <div id="samples-grid" class="samples-grid">
+            <div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-dim); padding: 8px;">Loading scenes...</div>
+          </div>
+        </div>
+
+        <!-- Optimal Parameter Badge (No manual sliders!) -->
+        <div class="glass panel-block">
+          <div class="panel-title">
+            <span>🔬</span> <span>Empirical Hyperparameters</span>
+            <span class="badge badge-emerald" style="margin-left: auto;">Auto-Configured ★</span>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 10px; padding: 12px; font-size: 11px; color: var(--text-muted);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>• Confidence Threshold (F1-Optimum):</span>
+              <strong style="color: #60a5fa;">Conf* = 0.25</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>• NMS IoU Threshold (VisDrone Benchmark):</span>
+              <strong style="color: #a78bfa;">IoU* = 0.50</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run Detection Button -->
+        <button id="run-btn" class="btn-detect" disabled onclick="runDetection()">
+          <span>🔍 Detect Objects</span>
+        </button>
+      </div>
+
+      <!-- Right Column: Visual Stage & Results -->
+      <div>
+        <div class="glass panel-block">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div class="panel-title" style="margin-bottom: 0;"><span>🎯</span> <span>Detection Viewer</span></div>
+            <div class="view-modes">
+              <button id="btn-mode-plain" class="btn-mode active" onclick="setViewMode('plain')">Plain</button>
+              <button id="btn-mode-compare" class="btn-mode" onclick="setViewMode('compare')">⇄ Compare</button>
+              <button id="btn-mode-zoom" class="btn-mode" onclick="setViewMode('zoom')">🔍 Deep-Zoom</button>
+            </div>
+          </div>
+
+          <!-- Placeholder -->
+          <div id="stage-placeholder" class="stage-placeholder">
+            <div style="font-size: 48px;">🛰️</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Select or upload an aerial drone image</div>
+            <div style="font-size: 11px; color: var(--text-dim);">Pick a preset on the left or upload a file</div>
+          </div>
+
+          <!-- Loading -->
+          <div id="stage-loading" class="stage-loading hidden">
+            <div class="spinner"></div>
+            <div style="font-size: 13px; font-weight: 700; color: #60a5fa;">Running HiSMD-Net Neural Inference...</div>
+            <div style="font-size: 11px; color: var(--text-dim);">ASRFR Sub-pixel SR → ResNet-50 → SpatialSSM → Stride-2 FPN</div>
+          </div>
+
+          <!-- Plain View -->
+          <div id="stage-plain" class="hidden">
+            <img id="result-img" class="plain-img" src="">
+          </div>
+
+          <!-- Compare Slider -->
+          <div id="stage-compare" class="compare-wrap hidden">
+            <div class="compare-after"><img id="cmp-after-img" src=""></div>
+            <div id="cmp-before-wrap" class="compare-before" style="width: 50%;"><img id="cmp-before-img" src=""></div>
+            <div id="cmp-line" class="compare-line" style="left: 50%;"><div class="compare-handle">⇄</div></div>
+            <span class="compare-tag" style="left: 10px;">Raw Drone Frame</span>
+            <span class="compare-tag" style="right: 10px;">HiSMD-Net Detections</span>
+          </div>
+
+          <!-- Zoom Canvas -->
+          <div id="stage-zoom" class="zoom-wrap hidden">
+            <canvas id="zoom-canvas"></canvas>
+          </div>
+
+          <!-- Latency & Export Bar -->
+          <div id="action-bar" class="action-bar hidden">
+            <span style="font-size: 12px; color: var(--text-dim);">
+              Inference Latency: <strong id="latency-text" style="color: #34d399;">— ms</strong>
+            </span>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-download" onclick="exportCSV()">⬇ CSV Report</button>
+              <button class="btn-download" onclick="downloadAnnotated()">⬇ Save Annotated PNG</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary & Table -->
+        <div id="summary-panel" class="glass panel-block hidden">
+          <div class="panel-title">
+            <span>📊</span> <span>Scene Detection Summary</span>
+            <span id="total-count-badge" class="badge badge-emerald" style="margin-left: auto;">0 Objects</span>
+          </div>
+          <div id="summary-grid" class="summary-grid"></div>
+
+          <div class="det-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Class</th><th>Confidence</th><th>Scale</th><th>Bounding Box [x1, y1, x2, y2]</th>
+                </tr>
+              </thead>
+              <tbody id="det-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ═══════════════════════ SCRIPT LOGIC ═══════════════════════ -->
+  <script>
+    // ── Relative Base URL (Fixes JupyterHub Proxy Routing & 403 XSRF) ──
+    const BASE = window.location.href.replace(/[?#].*$/, '').replace(/\/+$/, '');
+
+    const CLASS_NAMES = ['pedestrian','people','bicycle','car','van','truck','tricycle','awning-tricycle','bus','motor'];
+    const CLASS_COLORS = ['#ef4444','#f97316','#eab308','#06b6d4','#8b5cf6','#ec4899','#10b981','#3b82f6','#f59e0b','#64748b'];
+
+    let selectedFile = null;
+    let originalDataURL = null;
+    let annotatedDataURL = null;
+    let activeSampleId = null;
+    let lastResult = null;
+    let currentViewMode = 'plain';
+
+    // ── JupyterHub XSRF / CSRF Token Protection Fix (Prevents 403 Forbidden) ──
+    function getCookie(name) {
+      for (const c of document.cookie.split(';')) {
+        const [k, v] = c.trim().split('=');
+        if (k === name) return decodeURIComponent(v || '');
+      }
+      return '';
+    }
+    function getHeaders() {
+      const token = getCookie('_xsrf');
+      return token ? { 'X-XSRFToken': token } : {};
+    }
+
+    // ── Status Check ──
+    async function checkStatus() {
+      try {
+        const r = await fetch(BASE + '/api/status', { headers: getHeaders() });
+        const d = await r.json();
+        const pill = document.getElementById('status-pill');
+        pill.textContent = d.gpu ? `${d.gpu} (${d.vram_gb}GB)` : (d.device || 'Ready');
+        pill.className = 'badge badge-emerald';
+      } catch (e) {
+        document.getElementById('status-pill').textContent = 'Connecting...';
+      }
+    }
+    checkStatus();
+
+    // ── Load Sample Presets ──
+    async function loadSamples() {
+      const grid = document.getElementById('samples-grid');
+      try {
+        const r = await fetch(BASE + '/api/samples', { headers: getHeaders() });
+        const d = await r.json();
+        if (!d.samples || !d.samples.length) {
+          grid.innerHTML = '<div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-dim); padding: 8px;">No sample images found on server</div>';
+          return;
+        }
+        grid.innerHTML = '';
+        d.samples.forEach(s => {
+          const item = document.createElement('div');
+          item.className = 'sample-item';
+          item.id = 'sample-' + s.id;
+          item.onclick = () => runSample(s.id);
+          item.innerHTML = `<img src="data:image/jpeg;base64,${s.thumb_b64}"><div class="lbl">${s.name}</div>`;
+          grid.appendChild(item);
+        });
+      } catch (e) {
+        grid.innerHTML = '<div style="grid-column: span 3; text-align: center; font-size: 11px; color: var(--text-dim); padding: 8px;">Sample preset loading failed</div>';
+      }
+    }
+    loadSamples();
+
+    // ── File Drag & Drop ──
+    function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+    function onDragLeave() { document.getElementById('drop-zone').classList.remove('drag-over'); }
+    function onDrop(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').classList.remove('drag-over');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) loadLocalFile(f);
+    }
+    function onFileSelect(e) {
+      const f = e.target.files[0];
+      if (f) loadLocalFile(f);
+    }
+    function loadLocalFile(file) {
+      selectedFile = file;
+      activeSampleId = null;
+      document.querySelectorAll('.sample-item').forEach(i => i.classList.remove('active'));
+      const reader = new FileReader();
+      reader.onload = ev => {
+        originalDataURL = ev.target.result;
+        document.getElementById('preview-img').src = ev.target.result;
+        document.getElementById('preview-name').textContent = file.name;
+        document.getElementById('preview-info').textContent = `${(file.size / 1024).toFixed(1)} KB`;
+        document.getElementById('preview-box').classList.remove('hidden');
+        document.getElementById('run-btn').disabled = false;
+        resetVisualizer();
+      };
+      reader.readAsDataURL(file);
+    }
+    function clearSelectedFile() {
+      selectedFile = null; originalDataURL = null; activeSampleId = null;
+      document.getElementById('file-input').value = '';
+      document.getElementById('preview-box').classList.add('hidden');
+      document.getElementById('run-btn').disabled = true;
+      resetVisualizer();
+    }
+
+    // ── View Modes ──
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      ['plain', 'compare', 'zoom'].forEach(m => {
+        document.getElementById('btn-mode-' + m).classList.toggle('active', m === mode);
+        document.getElementById('stage-' + m).classList.add('hidden');
+      });
+      if (annotatedDataURL) {
+        document.getElementById('stage-' + mode).classList.remove('hidden');
+        if (mode === 'zoom') renderZoom();
+      }
+    }
+
+    // ── Run Detection (Includes XSRF Token & Optimal Conf/IoU Defaults) ──
+    async function runDetection() {
+      if (!selectedFile && activeSampleId === null) return;
+      if (activeSampleId !== null) { runSample(activeSampleId); return; }
+
+      showLoading();
+      const form = new FormData();
+      form.append('file', selectedFile);
+
+      try {
+        const res = await fetch(`${BASE}/api/predict?conf=0.25&iou=0.50`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: form
+        });
+        if (!res.ok) throw new Error('Inference Error (HTTP ' + res.status + ')');
+        const data = await res.json();
+        renderResults(data, originalDataURL);
+      } catch (err) {
+        hideLoading();
+        alert(err.message);
+      }
+    }
+
+    async function runSample(id) {
+      activeSampleId = id;
+      selectedFile = null;
+      document.querySelectorAll('.sample-item').forEach(i => i.classList.remove('active'));
+      const activeEl = document.getElementById('sample-' + id);
+      if (activeEl) activeEl.classList.add('active');
+
+      showLoading();
+      try {
+        const res = await fetch(`${BASE}/api/predict_sample/${id}?conf=0.25&iou=0.50`, {
+          headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('Sample error (HTTP ' + res.status + ')');
+        const data = await res.json();
+        const origSrc = data.original_image ? 'data:image/jpeg;base64,' + data.original_image : null;
+        originalDataURL = origSrc;
+        if (origSrc) {
+          document.getElementById('preview-img').src = origSrc;
+          document.getElementById('preview-name').textContent = 'Validation Sample #' + (id + 1);
+          document.getElementById('preview-info').textContent = data.image_size ? `${data.image_size[0]}×${data.image_size[1]} px` : '';
+          document.getElementById('preview-box').classList.remove('hidden');
+        }
+        document.getElementById('run-btn').disabled = false;
+        renderResults(data, origSrc);
+      } catch (err) {
+        hideLoading();
+        alert(err.message);
+      }
+    }
+
+    // ── Render Output ──
+    function renderResults(data, origSrc) {
+      hideLoading();
+      lastResult = data;
+      annotatedDataURL = 'data:image/jpeg;base64,' + data.annotated_image;
+
+      document.getElementById('result-img').src = annotatedDataURL;
+      if (origSrc) document.getElementById('cmp-before-img').src = origSrc;
+      document.getElementById('cmp-after-img').src = annotatedDataURL;
+      setCompare(50);
+
+      document.getElementById('latency-text').textContent = `${data.latency_ms} ms (${(1000 / Math.max(1, data.latency_ms)).toFixed(1)} FPS)`;
+      document.getElementById('action-bar').classList.remove('hidden');
+
+      const sumGrid = document.getElementById('summary-grid');
+      sumGrid.innerHTML = '';
+      const totalCard = document.createElement('div');
+      totalCard.className = 'sum-card';
+      totalCard.innerHTML = `<div class="sum-val" style="color: #34d399;">${data.total_detections}</div><div class="sum-lbl">Total Objects</div>`;
+      sumGrid.appendChild(totalCard);
+
+      for (const [cls, cnt] of Object.entries(data.class_counts || {})) {
+        const cid = CLASS_NAMES.indexOf(cls);
+        const col = CLASS_COLORS[cid >= 0 ? cid : 0];
+        const c = document.createElement('div');
+        c.className = 'sum-card';
+        c.innerHTML = `<div class="sum-val" style="color: ${col};">${cnt}</div><div class="sum-lbl">${cls}</div>`;
+        sumGrid.appendChild(c);
+      }
+
+      document.getElementById('total-count-badge').textContent = `${data.total_detections} Objects Detected`;
+      document.getElementById('summary-panel').classList.remove('hidden');
+
+      const tbody = document.getElementById('det-tbody');
+      tbody.innerHTML = '';
+      (data.detections || []).slice(0, 100).forEach((det, i) => {
+        const col = CLASS_COLORS[det.class_id % CLASS_COLORS.length];
+        const pct = Math.round(det.confidence * 100);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family: monospace; color: var(--text-dim);">${String(i + 1).padStart(2, '0')}</td>
+          <td><span class="badge" style="background: ${col}20; color: ${col};">${det.class_name}</span></td>
+          <td><strong style="color: ${col};">${pct}%</strong></td>
+          <td><span class="badge" style="background: rgba(255,255,255,0.06);">${det.size_cat}</span></td>
+          <td style="font-family: monospace; font-size: 10px; color: var(--text-dim);">[${det.box.join(', ')}]</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      setViewMode(currentViewMode);
+    }
+
+    // ── Compare Slider ──
+    let isCmpDragging = false;
+    function setCompare(pct) {
+      pct = Math.max(0, Math.min(100, pct));
+      document.getElementById('cmp-before-wrap').style.width = pct + '%';
+      document.getElementById('cmp-line').style.left = pct + '%';
+    }
+    const cmpWrap = document.getElementById('stage-compare');
+    cmpWrap.addEventListener('mousedown', () => isCmpDragging = true);
+    window.addEventListener('mouseup', () => isCmpDragging = false);
+    window.addEventListener('mousemove', e => {
+      if (!isCmpDragging) return;
+      const r = cmpWrap.getBoundingClientRect();
+      setCompare(((e.clientX - r.left) / r.width) * 100);
+    });
+
+    // ── Deep Zoom Canvas ──
+    let zoomImg = null, zoomScale = 1, zoomOx = 0, zoomOy = 0, isZoomDragging = false, zoomLx = 0, zoomLy = 0;
+    function renderZoom() {
+      const canvas = document.getElementById('zoom-canvas');
+      canvas.width = canvas.parentElement.clientWidth || 640;
+      canvas.height = canvas.parentElement.clientHeight || 380;
+      zoomImg = new Image();
+      zoomImg.onload = drawZoomCanvas;
+      zoomImg.src = annotatedDataURL;
+
+      canvas.onwheel = e => {
+        e.preventDefault();
+        const r = canvas.getBoundingClientRect();
+        const mx = e.clientX - r.left, my = e.clientY - r.top;
+        const delta = e.deltaY < 0 ? 1.15 : 0.87;
+        const newScale = Math.min(15, Math.max(1, zoomScale * delta));
+        zoomOx = mx - (mx - zoomOx) * (newScale / zoomScale);
+        zoomOy = my - (my - zoomOy) * (newScale / zoomScale);
+        zoomScale = newScale;
+        drawZoomCanvas();
+      };
+      canvas.onmousedown = e => { isZoomDragging = true; zoomLx = e.clientX; zoomLy = e.clientY; };
+      window.addEventListener('mouseup', () => isZoomDragging = false);
+      window.addEventListener('mousemove', e => {
+        if (!isZoomDragging) return;
+        zoomOx += e.clientX - zoomLx; zoomOy += e.clientY - zoomLy;
+        zoomLx = e.clientX; zoomLy = e.clientY;
+        drawZoomCanvas();
+      });
+    }
+
+    function drawZoomCanvas() {
+      if (!zoomImg || !zoomImg.complete) return;
+      const canvas = document.getElementById('zoom-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(zoomOx, zoomOy);
+      ctx.scale(zoomScale, zoomScale);
+      ctx.drawImage(zoomImg, 0, 0, canvas.width / zoomScale, canvas.height / zoomScale);
+      ctx.restore();
+
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.fillRect(10, 10, 80, 24);
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText(`${zoomScale.toFixed(1)}× Zoom`, 18, 26);
+    }
+
+    // ── Export ──
+    function downloadAnnotated() {
+      if (!annotatedDataURL) return;
+      const a = document.createElement('a');
+      a.href = annotatedDataURL;
+      a.download = 'HiSMDNet_Detection.png';
+      a.click();
+    }
+
+    function exportCSV() {
+      if (!lastResult || !lastResult.detections) return;
+      const rows = [['Index', 'Class', 'Confidence', 'Scale', 'x1', 'y1', 'x2', 'y2']];
+      lastResult.detections.forEach((d, i) => {
+        rows.push([i + 1, d.class_name, d.confidence, d.size_cat, ...d.box]);
+      });
+      const blob = new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'HiSMDNet_Detections.csv';
+      a.click();
+    }
+
+    function showLoading() {
+      document.getElementById('stage-placeholder').classList.add('hidden');
+      document.getElementById('stage-plain').classList.add('hidden');
+      document.getElementById('stage-compare').classList.add('hidden');
+      document.getElementById('stage-zoom').classList.add('hidden');
+      document.getElementById('action-bar').classList.add('hidden');
+      document.getElementById('summary-panel').classList.add('hidden');
+      document.getElementById('stage-loading').classList.remove('hidden');
+      document.getElementById('run-btn').disabled = true;
+    }
+    function hideLoading() {
+      document.getElementById('stage-loading').classList.add('hidden');
+      document.getElementById('run-btn').disabled = false;
+    }
+    function resetVisualizer() {
+      document.getElementById('stage-placeholder').classList.remove('hidden');
+      document.getElementById('stage-plain').classList.add('hidden');
+      document.getElementById('stage-compare').classList.add('hidden');
+      document.getElementById('stage-zoom').classList.add('hidden');
+      document.getElementById('action-bar').classList.add('hidden');
+      document.getElementById('summary-panel').classList.add('hidden');
+      annotatedDataURL = null;
+    }
+  </script>
+</body>
+</html>

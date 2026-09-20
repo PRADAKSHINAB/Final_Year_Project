@@ -1,0 +1,11 @@
+# Ignore heavy datasets, weight files >100MB, and cache
+Dataset/
+Dataset.tar
+Dataset.zip
+*.pt
+*.pth
+.cache/
+.local/
+__pycache__/
+*.pyc
+.DS_Store

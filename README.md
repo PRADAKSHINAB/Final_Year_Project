@@ -7,11 +7,6 @@
 [![APS](https://img.shields.io/badge/APS--Small-30.23%25-a78bfa?style=flat-square)](./hismdet_output/training_log.csv)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **Final Year Engineering Research Project**  
-> **Department of Computer Science and Engineering, Kongu Engineering College**  
-> **Authors:** Prahadheesh S (`prahadheeshs.23cse`) & Team  
-> **Trained on:** NVIDIA H200 NVL (HPC Cluster) · 100 Epochs
-
 ---
 
 ## 📌 Abstract
@@ -156,21 +151,4 @@ cd Final_Year_Project
 
 # Run 100-Epoch HiSMD-Net Training
 python train.py
-```
-
----
-
-## 📜 Citation & License
-
-This project is licensed under the **MIT License**.
-
-If you use **HiSMD-Net** in your research or project, please cite:
-
-```bibtex
-@article{prahadheesh2026hismdnet,
-  title={HiSMD-Net: Hierarchical Super-resolved Mamba Detector for UAV Small Object Detection},
-  author={Prahadheesh, S. and Team},
-  journal={Department of Computer Science and Engineering, Kongu Engineering College},
-  year={2026}
-}
 ```
